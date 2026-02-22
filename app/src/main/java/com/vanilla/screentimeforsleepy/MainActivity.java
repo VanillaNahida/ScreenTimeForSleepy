@@ -1,12 +1,14 @@
 package com.vanilla.screentimeforsleepy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvPermissionNeeded;
     private Button btnGrantPermission;
     private Button btnRefresh;
+    private Button btnSyncNow;
     private ImageButton btnSettings;
+    private ImageButton btnLogs;
     private Switch switchHideSystemApps;
     private UsageStatsHelper usageStatsHelper;
     private boolean hideSystemApps = true; // 默认隐藏系统应用
@@ -45,11 +49,18 @@ public class MainActivity extends AppCompatActivity {
         tvPermissionNeeded = findViewById(R.id.tv_permission_needed);
         btnGrantPermission = findViewById(R.id.btn_grant_permission);
         btnRefresh = findViewById(R.id.btn_refresh);
+        btnSyncNow = findViewById(R.id.btn_sync_now);
         btnSettings = findViewById(R.id.btn_settings);
+        btnLogs = findViewById(R.id.btn_logs);
         switchHideSystemApps = findViewById(R.id.switch_hide_system_apps);
 
         // 初始化UsageStatsHelper
         usageStatsHelper = new UsageStatsHelper(this);
+        
+        // 启动屏幕使用时间同步服务
+        AppLogger.i("MainActivity", "启动屏幕使用时间同步服务");
+        ScreenTimeSyncService.startService(this);
+        AppLogger.i("MainActivity", "应用启动成功");
 
         // 设置权限请求按钮点击事件
         btnGrantPermission.setOnClickListener(v -> {
@@ -61,6 +72,18 @@ public class MainActivity extends AppCompatActivity {
             checkPermissionAndLoadData();
         });
 
+        // 设置立即同步按钮点击事件
+        btnSyncNow.setOnClickListener(v -> {
+            ScreenTimeSyncService.startService(this);
+            Toast.makeText(this, "开始执行同步任务。", Toast.LENGTH_SHORT).show();
+        });
+
+        // 设置日志按钮点击事件
+        btnLogs.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LogsActivity.class);
+            startActivity(intent);
+        });
+
         // 设置设置按钮点击事件
         btnSettings.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -70,8 +93,16 @@ public class MainActivity extends AppCompatActivity {
         // 设置开关状态变化监听器
         switchHideSystemApps.setOnCheckedChangeListener((buttonView, isChecked) -> {
             hideSystemApps = isChecked;
+            // 保存设置
+            SharedPreferences prefs = getSharedPreferences("app_config", MODE_PRIVATE);
+            prefs.edit().putBoolean("hide_system_apps", isChecked).apply();
             checkPermissionAndLoadData();
         });
+
+        // 从设置中读取开关状态
+        SharedPreferences prefs = getSharedPreferences("app_config", MODE_PRIVATE);
+        hideSystemApps = prefs.getBoolean("hide_system_apps", true);
+        switchHideSystemApps.setChecked(hideSystemApps);
 
         // 设置默认开关状态
         switchHideSystemApps.setChecked(hideSystemApps);

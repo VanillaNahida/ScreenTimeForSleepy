@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".LogsActivity">
 
     <RelativeLayout
         android:id="@+id/rl_title"
@@ -17,38 +17,28 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
-            android:id="@+id/btn_logs"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_menu_manage"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="日志"
+            android:id="@+id/btn_back"
+            android:layout_width="37dp"
+            android:layout_height="38dp"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="返回"
+            android:src="?attr/homeAsUpIndicator" />
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="屏幕使用时间统计"
+            android:text="应用日志"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_centerInParent="true" />
 
-        <ImageButton
-            android:id="@+id/btn_settings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_settings"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="设置"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true" />
-
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/ll_controls"
+        android:id="@+id/ll_filter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
@@ -61,71 +51,67 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:id="@+id/tv_hide_system_apps"
+            android:id="@+id/tv_log_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="隐藏系统应用"
+            android:text="日志级别:"
             android:textSize="14sp"
             android:layout_marginRight="8dp" />
 
-        <Switch
-            android:id="@+id/switch_hide_system_apps"
+        <Spinner
+            android:id="@+id/spinner_log_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/btn_refresh"
+        <TextView
+            android:id="@+id/tv_auto_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="刷新"
+            android:text="自动滚动:"
+            android:textSize="14sp"
             android:layout_marginRight="8dp" />
 
-        <Button
-            android:id="@+id/btn_sync_now"
+        <Switch
+            android:id="@+id/switch_auto_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="立即同步" />
+            android:checked="true" />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_app_usage"
+    <TextView
+        android:id="@+id/tv_logs"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/ll_controls"
+        android:padding="12dp"
+        android:background="?android:attr/colorBackground"
+        android:text=""
+        android:textSize="14sp"
+        android:scrollbars="vertical"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:editable="false"
+        android:clickable="false"
+        android:focusable="false"
+        android:gravity="top|left"
+        app:layout_constraintTop_toBottomOf="@+id/ll_filter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/tv_permission_needed"
+        android:id="@+id/tv_empty_logs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="需要授予使用情况访问权限才能查看应用使用统计"
+        android:text="暂无日志"
         android:textSize="16sp"
         android:gravity="center"
         android:padding="16dp"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <Button
-        android:id="@+id/btn_grant_permission"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="授予权限"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/tv_permission_needed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

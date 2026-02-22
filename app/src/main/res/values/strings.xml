@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">屏幕使用时间统计</string>
+    <string name="accessibility_service_description">屏幕使用时间统计服务，用于监控应用使用情况</string>
 </resources>
