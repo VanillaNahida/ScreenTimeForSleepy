@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 排序方式 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="排序方式"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/rg_sort_by"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/rb_app_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="应用名称" />
+
+        <RadioButton
+            android:id="@+id/rb_package_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="应用包名" />
+
+        <RadioButton
+            android:id="@+id/rb_install_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="安装时间" />
+
+        <RadioButton
+            android:id="@+id/rb_update_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="更新时间" />
+
+    </RadioGroup>
+
+    <!-- 其他选项 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/cb_sort_descending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="倒序" />
+
+        <CheckBox
+            android:id="@+id/cb_show_system_apps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="显示系统应用" />
+
+        <CheckBox
+            android:id="@+id/cb_show_only_checked"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="显示已勾选的应用" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -39,6 +39,9 @@ public class AppUsageTracker {
     public Map<String, AppUsageSyncInfo> getTodayAppUsage(boolean hideSystemApps) {
         Map<String, AppUsageSyncInfo> appUsageMap = new TreeMap<>();
         
+        // 获取AppFilterManager实例
+        AppFilterManager filterManager = new AppFilterManager(context);
+        
         // 获取今天的开始时间
         long startTime = getTodayStartTime();
         long endTime = System.currentTimeMillis();
@@ -69,8 +72,14 @@ public class AppUsageTracker {
                         continue;
                     }
                     
-                    // 获取应用名称
+                    // 获取应用名称和包名
                     String appName = appInfo.loadLabel(packageManager).toString();
+                    String packageName = appInfo.packageName;
+                    
+                    // 根据黑白名单过滤应用
+                    if (!filterManager.shouldIncludeApp(packageName)) {
+                        continue;
+                    }
                     
                     // 获取应用图标并保存
                     String iconFileName = saveAppIcon(appInfo);

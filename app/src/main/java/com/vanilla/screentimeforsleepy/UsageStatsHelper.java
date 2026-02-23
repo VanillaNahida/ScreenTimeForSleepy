@@ -28,6 +28,9 @@ public class UsageStatsHelper {
      * 获取当日应用使用统计
      */
     public List<AppUsageInfo> getTodayUsageStats(boolean hideSystemApps) {
+        // 获取AppFilterManager实例
+        AppFilterManager filterManager = new AppFilterManager(context);
+        
         // 获取今天凌晨的时间戳
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -58,6 +61,12 @@ public class UsageStatsHelper {
                     }
                     
                     String appName = packageManager.getApplicationLabel(appInfo).toString();
+                    String packageName = appInfo.packageName;
+                    
+                    // 根据黑白名单过滤应用
+                    if (!filterManager.shouldIncludeApp(packageName)) {
+                        continue;
+                    }
                     
                     AppUsageInfo appUsageInfo = new AppUsageInfo(
                             appName,

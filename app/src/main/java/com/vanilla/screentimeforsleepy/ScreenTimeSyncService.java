@@ -151,9 +151,13 @@ public class ScreenTimeSyncService extends Service {
                 handler.post(() -> {
                     String syncTime = appUsageTracker.getCurrentTime();
                     if (success) {
-                        updateNotification("同步成功，应用数: " + appUsageMap.size() + " | " + syncTime);
+                        String notificationText = "同步成功，应用数: " + appUsageMap.size() + " | " + syncTime;
+                        updateNotification(notificationText);
+                        AppLogger.i(TAG, notificationText);
                     } else {
-                        updateNotification("同步失败 | " + syncTime);
+                        String notificationText = "同步失败 | " + syncTime;
+                        updateNotification(notificationText);
+                        AppLogger.e(TAG, notificationText);
                     }
                 });
             });
