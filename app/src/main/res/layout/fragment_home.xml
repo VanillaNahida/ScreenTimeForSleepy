@@ -13,7 +13,7 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="屏幕使用时间"
+        android:text="屏幕使用时间统计"
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
