@@ -2,8 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="app_card_background">#FF2C2C2C</color>
+    <!-- 主题色 -->
+    <color name="theme_color">#a1de93</color>
+    <color name="app_card_background">#CC2C2C2C</color>
     <color name="app_card_text">#FFFFFFFF</color>
     <color name="progress_bar_background">#424242</color>
-    <color name="progress_bar_progress">#4CAF50</color>
+    <color name="progress_bar_progress">@color/theme_color</color>
+    <!-- 日志背景色 - 黑色半透明 -->
+    <color name="logs_background">#CC000000</color>
 </resources>

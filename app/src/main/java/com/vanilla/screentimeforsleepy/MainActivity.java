@@ -27,6 +27,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // 应用主题设置
+        ThemeManager themeManager = new ThemeManager(this);
+        themeManager.applyTheme();
+
         // 初始化底部导航栏
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this::onNavigationItemSelected);
@@ -40,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 每次恢复时重新应用主题（设置页面修改后会立即生效）
+        ThemeManager themeManager = new ThemeManager(this);
+        themeManager.applyTheme();
     }
 
     // 底部导航栏选择监听器
@@ -64,7 +76,13 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
-                    .commit();
+                    .commitNow();
+            // 应用主题设置，确保切换Fragment后主题保持一致
+            // 使用postDelayed确保Fragment的视图已经创建完成
+            findViewById(R.id.fragment_container).post(() -> {
+                ThemeManager themeManager = new ThemeManager(this);
+                themeManager.applyTheme();
+            });
             return true;
         }
         return false;

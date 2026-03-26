@@ -80,6 +80,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // 应用主题设置
+        ThemeManager themeManager = new ThemeManager(getActivity());
+        themeManager.applyTheme();
         // 在恢复时重新检查权限并加载数据
         checkPermissionAndLoadData();
     }

@@ -63,7 +63,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:padding="12dp"
-        android:background="?android:attr/colorBackground"
+        android:background="@color/logs_background"
         android:text=""
         android:textSize="14sp"
         android:scrollbars="vertical"

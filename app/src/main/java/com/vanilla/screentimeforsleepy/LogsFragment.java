@@ -49,6 +49,14 @@ public class LogsFragment extends Fragment {
 
         return view;
     }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 应用主题设置
+        ThemeManager themeManager = new ThemeManager(getActivity());
+        themeManager.applyTheme();
+    }
 
     private void setupAutoScrollSwitch() {
         switchAutoScroll.setChecked(autoScrollEnabled);
