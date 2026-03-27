@@ -44,7 +44,7 @@ public class SettingsFragment extends Fragment {
     private Button btnSave, btnAutoStart, btnBatteryOptimization, btnManageBlacklist, btnManageWhitelist, btnClearIconCache, btnPickBackground;
     private TextView tvNotification, tvAccessibility, tvBackgroundStatus, tvBackgroundOpacityValue, tvCardOpacityValue, tvLogsOpacityValue;
     private android.widget.SeekBar sbBackgroundOpacity, sbCardOpacity, sbLogsOpacity;
-    private Switch swNotification, swAccessibility, swHideSystemApps, swBlacklist, swWhitelist;
+    private Switch swNotification, swAccessibility, swHideSystemApps, swBlacklist, swWhitelist, swHideInMultitask;
     private ImageButton btnToggleApiKey;
     private SharedPreferences sharedPreferences;
     private boolean isApiKeyVisible = false;
@@ -98,6 +98,7 @@ public class SettingsFragment extends Fragment {
             swNotification.setTrackTintList(trackColorStateList);
             swAccessibility.setTrackTintList(trackColorStateList);
             swHideSystemApps.setTrackTintList(trackColorStateList);
+            swHideInMultitask.setTrackTintList(trackColorStateList);
             swBlacklist.setTrackTintList(trackColorStateList);
             swWhitelist.setTrackTintList(trackColorStateList);
         } catch (Exception e) {
@@ -111,13 +112,11 @@ public class SettingsFragment extends Fragment {
         int defaultTrackColor = getDefaultTrackColor();
         int disabledTrackColor = getDisabledTrackColor();
         
-        int[][] states = new int[][]{
-            new int[]{-android.R.attr.state_enabled}, // 禁用状态
+        int[][] states = new int[][]{new int[]{-android.R.attr.state_enabled}, // 禁用状态
             new int[]{android.R.attr.state_checked},  // 开启状态（checked）
             new int[]{}                               // 默认状态（关闭）
         };
-        int[] colors = new int[]{
-            disabledTrackColor, // 禁用状态保持默认
+        int[] colors = new int[]{disabledTrackColor, // 禁用状态保持默认
             color,              // 开启状态使用主题色
             defaultTrackColor   // 关闭状态保持默认
         };
@@ -177,6 +176,7 @@ public class SettingsFragment extends Fragment {
         swNotification = view.findViewById(R.id.sw_notification);
         swAccessibility = view.findViewById(R.id.sw_accessibility);
         swHideSystemApps = view.findViewById(R.id.sw_hide_system_apps);
+        swHideInMultitask = view.findViewById(R.id.sw_hide_in_multitask);
         swBlacklist = view.findViewById(R.id.sw_blacklist);
         swWhitelist = view.findViewById(R.id.sw_whitelist);
     }
@@ -261,7 +261,7 @@ public class SettingsFragment extends Fragment {
         // 保存按钮点击事件
         btnSave.setOnClickListener(v -> {
             saveConfig(); // 保存配置
-            Toast.makeText(getActivity(), "配置已保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "配置已保存~", Toast.LENGTH_SHORT).show();
         });
 
         // 自启动权限按钮
@@ -546,13 +546,14 @@ public class SettingsFragment extends Fragment {
         tvLogsOpacityValue.setText((int) (logsOpacity * 100) + "%");
         
         swHideSystemApps.setChecked(sharedPreferences.getBoolean("hide_system_apps", true));
+        swHideInMultitask.setChecked(sharedPreferences.getBoolean("hide_in_multitask", false));
         
         // 加载背景图片状态
         String backgroundImage = sharedPreferences.getString("background_image", "");
         if (!backgroundImage.isEmpty()) {
-            tvBackgroundStatus.setText("已设置背景图片");
+            tvBackgroundStatus.setText("已设置");
         } else {
-            tvBackgroundStatus.setText("未设置背景图片");
+            tvBackgroundStatus.setText("未设置");
         }
         
         // 加载黑白名单启用状态
@@ -563,6 +564,10 @@ public class SettingsFragment extends Fragment {
 
     // 保存配置
     private void saveConfig() {
+        // 检查多任务隐藏设置是否发生变化
+        boolean oldHideInMultitask = sharedPreferences.getBoolean("hide_in_multitask", false);
+        boolean newHideInMultitask = swHideInMultitask.isChecked();
+        
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("api_url", etApiUrl.getText().toString());
         editor.putString("api_key", etApiKey.getText().toString());
@@ -581,6 +586,7 @@ public class SettingsFragment extends Fragment {
         }
         editor.putInt("check_interval", interval);
         editor.putBoolean("hide_system_apps", swHideSystemApps.isChecked());
+        editor.putBoolean("hide_in_multitask", newHideInMultitask);
         editor.putBoolean("enable_blacklist", swBlacklist.isChecked());
         editor.putBoolean("enable_whitelist", swWhitelist.isChecked());
         
@@ -606,7 +612,19 @@ public class SettingsFragment extends Fragment {
         // 清除内存存储中的临时设置
         ThemeMemoryStorage.getInstance().clear();
         
-        Toast.makeText(getActivity(), "主题设置已保存并应用", Toast.LENGTH_SHORT).show();
+        // 如果修改了多任务隐藏设置，实时生效
+        if (oldHideInMultitask != newHideInMultitask) {
+            // 使用ActivityManager API实时生效 (API 21+)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                android.app.ActivityManager am = (android.app.ActivityManager) getActivity().getSystemService(android.content.Context.ACTIVITY_SERVICE);
+                if (am != null) {
+                    java.util.List<android.app.ActivityManager.AppTask> tasks = am.getAppTasks();
+                    if (tasks != null && !tasks.isEmpty()) {
+                        tasks.get(0).setExcludeFromRecents(newHideInMultitask);
+                    }
+                }
+            }
+        }
     }
 
     // 检查权限状态

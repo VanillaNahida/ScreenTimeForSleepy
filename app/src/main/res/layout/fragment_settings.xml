@@ -51,7 +51,7 @@
                     android:id="@+id/et_api_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="http://example.com:8000"
+                    android:hint="http://example.com"
                     android:inputType="textUri" />
 
             </LinearLayout>
@@ -252,10 +252,30 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="隐藏系统应用" />
+                android:text="上报时跳过系统应用" />
 
             <Switch
                 android:id="@+id/sw_hide_system_apps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="在多任务隐藏后台" />
+
+            <Switch
+                android:id="@+id/sw_hide_in_multitask"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -287,36 +307,29 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_marginBottom="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="背景图片:" />
+                    android:text="背景图片：" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_background_status"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:layout_weight="1"
+                    android:text="未设置" 
+                    android:textSize="14sp" />
 
-                    <TextView
-                        android:id="@+id/tv_background_status"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="未设置背景图片" 
-                        android:textSize="14sp" />
-
-                    <Button
-                        android:id="@+id/btn_pick_background"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="选择背景图片" 
-                        android:layout_marginStart="8dp" />
-
-                </LinearLayout>
+                <Button
+                    android:id="@+id/btn_pick_background"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="选择背景图片" 
+                    android:layout_marginStart="8dp" />
 
             </LinearLayout>
 

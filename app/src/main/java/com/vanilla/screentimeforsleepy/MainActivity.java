@@ -1,5 +1,6 @@
 package com.vanilla.screentimeforsleepy;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -20,6 +21,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        
+        // 检查是否需要隐藏在最近任务中
+        SharedPreferences prefs = getSharedPreferences("app_config", MODE_PRIVATE);
+        boolean hideInMultitask = prefs.getBoolean("hide_in_multitask", false);
+        
+        // 使用ActivityManager API设置是否显示在最近任务中 (API 21+)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            android.app.ActivityManager.TaskDescription taskDescription = new android.app.ActivityManager.TaskDescription(null, null, 0);
+            setTaskDescription(taskDescription);
+            
+            // 使用ActivityManager API设置任务的排除状态
+            android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(android.content.Context.ACTIVITY_SERVICE);
+            if (am != null) {
+                java.util.List<android.app.ActivityManager.AppTask> tasks = am.getAppTasks();
+                if (tasks != null && !tasks.isEmpty()) {
+                    tasks.get(0).setExcludeFromRecents(hideInMultitask);
+                }
+            }
+        }
+        
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
