@@ -11,6 +11,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 
+import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
+import com.vanilla.screentimeforsleepy.util.AppLogger;
+import com.vanilla.screentimeforsleepy.util.AppUsageSyncInfo;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

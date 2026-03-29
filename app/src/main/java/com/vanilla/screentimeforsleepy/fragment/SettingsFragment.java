@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.activity;
 
 
 import android.content.Intent;
@@ -22,15 +22,19 @@ import android.widget.Toast;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Environment;
+
+import com.vanilla.screentimeforsleepy.AppUsageInfo;
+import com.vanilla.screentimeforsleepy.R;
+import com.vanilla.screentimeforsleepy.ScreenTimeService;
+import com.vanilla.screentimeforsleepy.ThemeManager;
+import com.vanilla.screentimeforsleepy.ThemeMemoryStorage;
+import com.vanilla.screentimeforsleepy.UsageStatsHelper;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

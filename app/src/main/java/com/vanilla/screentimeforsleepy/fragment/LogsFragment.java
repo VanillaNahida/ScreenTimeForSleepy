@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.activity;
 
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -13,6 +13,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+
+import com.vanilla.screentimeforsleepy.AppLogger;
+import com.vanilla.screentimeforsleepy.R;
+import com.vanilla.screentimeforsleepy.ThemeManager;
 
 import java.util.List;
 

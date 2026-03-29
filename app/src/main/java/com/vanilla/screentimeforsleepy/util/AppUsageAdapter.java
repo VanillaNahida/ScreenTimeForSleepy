@@ -10,6 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.vanilla.screentimeforsleepy.activity.AppFilterActivity;
+import com.vanilla.screentimeforsleepy.util.UsageStatsHelper;
+
 import java.util.List;
 
 public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsageViewHolder> {

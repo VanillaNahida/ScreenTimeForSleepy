@@ -3,6 +3,8 @@ package com.vanilla.screentimeforsleepy;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.vanilla.screentimeforsleepy.activity.AppFilterActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
