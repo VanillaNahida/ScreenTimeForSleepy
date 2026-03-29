@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 /**
  * 主题内存存储类

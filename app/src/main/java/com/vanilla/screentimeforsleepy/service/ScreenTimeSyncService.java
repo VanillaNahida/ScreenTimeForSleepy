@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,19 +12,23 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+
+import com.vanilla.screentimeforsleepy.util.AppLogger;
+import com.vanilla.screentimeforsleepy.util.AppUsageSyncInfo;
+import com.vanilla.screentimeforsleepy.util.AppUsageTracker;
+import com.vanilla.screentimeforsleepy.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -96,7 +100,7 @@ public class ScreenTimeSyncService extends Service {
         } else {
             startService(restartIntent);
         }
-        AppLogger.d(TAG, "Service destroyed, attempting restart");
+        AppLogger.d(TAG, "服务已销毁，尝试重启");
     }
 
     // 启动同步任务
@@ -114,7 +118,7 @@ public class ScreenTimeSyncService extends Service {
                     Thread.sleep(checkInterval * 1000);
                     
                 } catch (InterruptedException e) {
-                    AppLogger.e(TAG, "Sync task interrupted", e);
+                    AppLogger.e(TAG, "同步任务被中断", e);
                     break;
                 }
             }
@@ -145,7 +149,9 @@ public class ScreenTimeSyncService extends Service {
             
             // 异步发送数据到服务器
             networkExecutor.execute(() -> {
+                long startTime = System.currentTimeMillis();
                 boolean success = sendScreenTimeData(serverUrl, apiKey, jsonData);
+                long duration = System.currentTimeMillis() - startTime;
                 
                 // 更新通知
                 handler.post(() -> {
@@ -153,11 +159,21 @@ public class ScreenTimeSyncService extends Service {
                     if (success) {
                         String notificationText = "同步成功，应用数: " + appUsageMap.size() + " | " + syncTime;
                         updateNotification(notificationText);
-                        AppLogger.i(TAG, notificationText);
+                        // 记录上报状态报告
+                        Map<String, String> params = new HashMap<>();
+                        params.put("应用数量", String.valueOf(appUsageMap.size()));
+                        params.put("同步时间", syncTime);
+                        params.put("耗时", duration + "ms");
+                        AppLogger.logUploadStatus("上报状态报告", params);
                     } else {
                         String notificationText = "同步失败 | " + syncTime;
                         updateNotification(notificationText);
-                        AppLogger.e(TAG, notificationText);
+                        // 记录上报失败报告
+                        Map<String, String> params = new HashMap<>();
+                        params.put("错误码", "500");
+                        params.put("同步时间", syncTime);
+                        params.put("耗时", duration + "ms");
+                        AppLogger.logUploadError("上报失败报告", params);
                     }
                 });
             });
@@ -168,7 +184,7 @@ public class ScreenTimeSyncService extends Service {
             });
             
         } catch (Exception e) {
-            AppLogger.e(TAG, "Error syncing screen time data", e);
+            AppLogger.e(TAG, "同步屏幕使用时间数据出错", e);
             updateNotification("同步出错: " + e.getMessage());
         }
     }
@@ -223,11 +239,23 @@ public class ScreenTimeSyncService extends Service {
             int responseCode = connection.getResponseCode();
             connection.disconnect();
             
-            AppLogger.d(TAG, "Screen time data sent, response code: " + responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                AppLogger.d(TAG, "屏幕使用时间数据已发送，响应码: " + responseCode);
+            } else {
+                // 记录非200响应码的错误信息
+                Map<String, String> params = new HashMap<>();
+                params.put("错误码", String.valueOf(responseCode));
+                AppLogger.logUploadError("服务器返回错误", params);
+            }
             return responseCode == HttpURLConnection.HTTP_OK;
             
         } catch (Exception e) {
-            AppLogger.e(TAG, "Error sending screen time data", e);
+            // 记录网络异常
+            Map<String, String> params = new HashMap<>();
+            params.put("错误类型", e.getClass().getSimpleName());
+            params.put("错误消息", e.getMessage() != null ? e.getMessage() : "未知错误");
+            AppLogger.logUploadError("发送数据异常", params);
+            AppLogger.e(TAG, "发送屏幕使用时间数据出错", e);
             return false;
         }
     }
@@ -283,11 +311,11 @@ public class ScreenTimeSyncService extends Service {
             
             // 获取响应
             int responseCode = connection.getResponseCode();
-            AppLogger.d(TAG, "Icon uploaded: " + iconFileName + ", response code: " + responseCode);
+            AppLogger.d(TAG, "图标已上传: " + iconFileName + ", 响应码: " + responseCode);
             connection.disconnect();
             
         } catch (Exception e) {
-            AppLogger.e(TAG, "Error uploading app icon: " + iconFileName, e);
+            AppLogger.e(TAG, "上传应用图标出错: " + iconFileName, e);
         }
     }
 
@@ -310,7 +338,7 @@ public class ScreenTimeSyncService extends Service {
     // 创建通知
     private Notification createNotification(String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.appicon)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("屏幕使用时间同步")
                 .setContentText(content)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

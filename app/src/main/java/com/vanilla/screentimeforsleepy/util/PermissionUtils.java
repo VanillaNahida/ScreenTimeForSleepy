@@ -1,12 +1,10 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 import android.app.AppOpsManager;
-import android.util.Log;
 
 public class PermissionUtils {
     private static final String TAG = "PermissionUtils";

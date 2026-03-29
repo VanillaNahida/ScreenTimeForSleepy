@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,6 +12,13 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.vanilla.screentimeforsleepy.util.AppLogger;
+import com.vanilla.screentimeforsleepy.HomeFragment;
+import com.vanilla.screentimeforsleepy.R;
+import com.vanilla.screentimeforsleepy.service.ScreenTimeSyncService;
+import com.vanilla.screentimeforsleepy.util.ThemeManager;
+import com.vanilla.screentimeforsleepy.fragment.LogsFragment;
+import com.vanilla.screentimeforsleepy.fragment.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
 

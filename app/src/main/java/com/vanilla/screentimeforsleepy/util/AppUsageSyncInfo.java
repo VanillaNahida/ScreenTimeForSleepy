@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 public class AppUsageSyncInfo {
     private String icon;

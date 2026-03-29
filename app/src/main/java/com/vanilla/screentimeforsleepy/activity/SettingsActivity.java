@@ -1,13 +1,11 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,6 +20,9 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.vanilla.screentimeforsleepy.R;
+import com.vanilla.screentimeforsleepy.service.ScreenTimeService;
 
 public class SettingsActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.util.Log;
 
@@ -10,7 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AppLogger {
 
@@ -59,41 +61,67 @@ public class AppLogger {
      * 记录日志
      */
     private static void log(String level, String tag, String message) {
+        log(level, tag, message, null);
+    }
+    
+    /**
+     * 记录日志（带参数）
+     */
+    private static void log(String level, String tag, String message, Map<String, String> params) {
         String timestamp = DATE_FORMAT.format(new Date());
-        
-        // 获取线程信息
-        Thread currentThread = Thread.currentThread();
-        String threadName = currentThread.getName();
-        long threadId = currentThread.getId();
         
         // 获取调用栈信息
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        String className = "Unknown";
-        String methodName = "Unknown";
+        String className = "未知";
+        String methodName = "未知";
         int lineNumber = 0;
         
-        if (stackTrace.length > 4) {
-            StackTraceElement element = stackTrace[4];
+        if (stackTrace.length > 5) {
+            StackTraceElement element = stackTrace[5];
             className = element.getClassName();
+            // 只保留简单类名
+            int lastDotIndex = className.lastIndexOf('.');
+            if (lastDotIndex != -1) {
+                className = className.substring(lastDotIndex + 1);
+            }
             methodName = element.getMethodName();
             lineNumber = element.getLineNumber();
         }
         
-        // 构建详细的日志消息
-        String logMessage = timestamp + " [" + level + "] " + tag + " - " + message + "\n" +
-                           "  Thread: " + threadName + " (ID: " + threadId + ")\n" +
-                           "  Location: " + className + "." + methodName + "():" + lineNumber;
+        // 构建参数部分
+        StringBuilder paramsBuilder = new StringBuilder();
+        if (params != null && !params.isEmpty()) {
+            paramsBuilder.append(" | ");
+            boolean first = true;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                if (!first) {
+                    paramsBuilder.append(", ");
+                }
+                paramsBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+                first = false;
+            }
+        }
+        
+        // 构建统一格式的日志消息
+        String logMessage = String.format("[%s] [%s] [ScreenTime] [%s:%s:%d] - %s%s",
+                timestamp,
+                level,
+                className,
+                methodName,
+                lineNumber,
+                message,
+                paramsBuilder.toString());
         
         // 输出到Android日志
         switch (level) {
             case INFO:
-                Log.i(tag, message);
+                Log.i(tag, logMessage);
                 break;
             case DEBUG:
-                Log.d(tag, message);
+                Log.d(tag, logMessage);
                 break;
             case ERROR:
-                Log.e(tag, message);
+                Log.e(tag, logMessage);
                 break;
         }
         
@@ -105,6 +133,20 @@ public class AppLogger {
         
         // 写入文件
         writeToFile(logMessage);
+    }
+    
+    /**
+     * 记录上报状态报告
+     */
+    public static void logUploadStatus(String message, Map<String, String> params) {
+        log(INFO, "ScreenTime", message, params);
+    }
+    
+    /**
+     * 记录上报失败报告
+     */
+    public static void logUploadError(String message, Map<String, String> params) {
+        log(ERROR, "ScreenTime", message, params);
     }
 
     /**
@@ -194,9 +236,32 @@ public class AppLogger {
     }
 
     /**
-     * 清空日志
+     * 清空日志（仅内存中的日志）
      */
     public static void clearLogs() {
         logBuffer.clear();
+    }
+
+    /**
+     * 删除全部日志（内存和文件）
+     */
+    public static void deleteAllLogs() {
+        // 清空内存中的日志
+        logBuffer.clear();
+        
+        // 删除所有日志文件
+        try {
+            File dir = new File(android.os.Environment.getDataDirectory(), "data/com.vanilla.screentimeforsleepy/logs");
+            if (dir.exists() && dir.isDirectory()) {
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File file : files) {
+                        file.delete();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error deleting log files", e);
+        }
     }
 }

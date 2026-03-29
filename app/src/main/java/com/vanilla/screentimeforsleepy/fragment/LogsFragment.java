@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy.activity;
+package com.vanilla.screentimeforsleepy.fragment;
 
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
@@ -8,15 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-
 import androidx.fragment.app.Fragment;
-
-import com.vanilla.screentimeforsleepy.AppLogger;
+import com.vanilla.screentimeforsleepy.util.AppLogger;
 import com.vanilla.screentimeforsleepy.R;
-import com.vanilla.screentimeforsleepy.ThemeManager;
+import com.vanilla.screentimeforsleepy.util.ThemeManager;
 
 import java.util.List;
 
@@ -26,6 +25,7 @@ public class LogsFragment extends Fragment {
     private Switch switchAutoScroll;
     private TextView tvLogs;
     private TextView tvEmptyLogs;
+    private ImageView ivDeleteLogs;
     private String selectedLogLevel = "INFO";
     private boolean autoScrollEnabled = true;
 
@@ -38,6 +38,7 @@ public class LogsFragment extends Fragment {
         switchAutoScroll = view.findViewById(R.id.switch_auto_scroll);
         tvLogs = view.findViewById(R.id.tv_logs);
         tvEmptyLogs = view.findViewById(R.id.tv_empty_logs);
+        ivDeleteLogs = view.findViewById(R.id.iv_delete_logs);
 
         // 启用 TextView 滚动功能
         tvLogs.setMovementMethod(new android.text.method.ScrollingMovementMethod());
@@ -47,6 +48,9 @@ public class LogsFragment extends Fragment {
 
         // 设置日志级别选择器
         setupLogLevelSpinner();
+
+        // 设置删除按钮点击事件
+        setupDeleteButton();
 
         // 加载日志
         loadLogs();
@@ -110,6 +114,41 @@ public class LogsFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void setupDeleteButton() {
+        // 短按 - 清除当前日志
+        ivDeleteLogs.setOnClickListener(v -> {
+            // 显示确认对话框
+            new androidx.appcompat.app.AlertDialog.Builder(getActivity())
+                    .setTitle("提示")
+                    .setMessage("确定要清除当前日志吗？\n（长按右上角按钮可删除全部日志）")
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        // 清空内存中的日志
+                        AppLogger.clearLogs();
+                        // 重新加载日志
+                        loadLogs();
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
+        });
+
+        // 长按 - 删除全部日志
+        ivDeleteLogs.setOnLongClickListener(v -> {
+            // 显示确认对话框
+            new androidx.appcompat.app.AlertDialog.Builder(getActivity())
+                    .setTitle("警告")
+                    .setMessage("确定要删除全部日志吗（包括应用数据目录内的所有日志文件）？\n*删除后将不可恢复")
+                    .setPositiveButton("确定", (dialog, which) -> {
+                        // 删除全部日志（内存和文件）
+                        AppLogger.deleteAllLogs();
+                        // 重新加载日志
+                        loadLogs();
+                    })
+                    .setNegativeButton("取消", null)
+                    .show();
+            return true;
+        });
     }
 
     private void loadLogs() {

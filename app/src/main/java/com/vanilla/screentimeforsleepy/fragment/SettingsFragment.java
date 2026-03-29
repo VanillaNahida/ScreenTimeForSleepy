@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy.activity;
+package com.vanilla.screentimeforsleepy.fragment;
 
 
 import android.content.Intent;
@@ -28,12 +28,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 
-import com.vanilla.screentimeforsleepy.AppUsageInfo;
+import com.vanilla.screentimeforsleepy.util.AppUsageInfo;
 import com.vanilla.screentimeforsleepy.R;
-import com.vanilla.screentimeforsleepy.ScreenTimeService;
-import com.vanilla.screentimeforsleepy.ThemeManager;
-import com.vanilla.screentimeforsleepy.ThemeMemoryStorage;
-import com.vanilla.screentimeforsleepy.UsageStatsHelper;
+import com.vanilla.screentimeforsleepy.service.ScreenTimeService;
+import com.vanilla.screentimeforsleepy.util.ThemeManager;
+import com.vanilla.screentimeforsleepy.util.ThemeMemoryStorage;
+import com.vanilla.screentimeforsleepy.util.UsageStatsHelper;
+import com.vanilla.screentimeforsleepy.activity.AppFilterActivity;
+import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -357,7 +359,7 @@ public class SettingsFragment extends Fragment {
         btnClearIconCache.setOnClickListener(v -> {
             // 显示二次确认弹窗
             new androidx.appcompat.app.AlertDialog.Builder(getActivity())
-                .setTitle("确认清除")
+                .setTitle("提示")
                 .setMessage("你确定要删除并更新缓存的图标吗？这样会重新生成最新的应用图标，仅建议在更换系统主题时首页应用图标未更新时使用。")
                 .setPositiveButton("确定", (dialog, which) -> {
                     // 清除缓存的图标
@@ -370,18 +372,15 @@ public class SettingsFragment extends Fragment {
         
         // 背景图片选择按钮
         btnPickBackground.setOnClickListener(v -> {
-            // 使用标准DocumentUI选择图片
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            startActivityForResult(intent, REQUEST_PICK_BACKGROUND);
+            // 使用系统照片选择器
+            launchPhotoPicker();
         });
     }
     
     // 清除缓存的图标
     private void clearIconCache() {
         // 获取正确的图标缓存目录路径（与AppUsageTracker中一致）
-        File iconCacheDir = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "app_icons");
+        File iconCacheDir = new File(getActivity().getExternalFilesDir(null), "app_icons");
         if (iconCacheDir.exists()) {
             // 递归删除缓存目录
             deleteDirectory(iconCacheDir);
@@ -405,7 +404,7 @@ public class SettingsFragment extends Fragment {
                 List<AppUsageInfo> appUsageInfoList = usageStatsHelper.getTodayUsageStats(hideSystemApps);
                 
                 // 重新创建图标目录
-                File iconDir = new File(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "app_icons");
+                File iconDir = new File(getActivity().getExternalFilesDir(null), "app_icons");
                 if (!iconDir.exists()) {
                     iconDir.mkdirs();
                 }
@@ -475,6 +474,21 @@ public class SettingsFragment extends Fragment {
         return false;
     }
     
+    // 启动照片选择器
+    private void launchPhotoPicker() {
+        Intent intent;
+        // Android 13+ 使用系统照片选择器
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            intent = new Intent(android.provider.MediaStore.ACTION_PICK_IMAGES);
+        } else {
+            // Android 12 及以下使用 ACTION_GET_CONTENT
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+        startActivityForResult(intent, REQUEST_PICK_BACKGROUND);
+    }
+    
     // 处理Activity结果
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -503,8 +517,14 @@ public class SettingsFragment extends Fragment {
                     appDataDir.mkdirs();
                 }
                 
-                // 创建目标文件
-                String fileName = "background_" + System.currentTimeMillis() + ".jpg";
+                // 获取原始文件的扩展名
+                String fileExtension = getFileExtension(uri);
+                
+                // 删除旧的背景文件
+                deleteOldBackgroundFiles(appDataDir);
+                
+                // 创建目标文件，固定命名为 app_background.xxx
+                String fileName = "app_background." + fileExtension;
                 File outputFile = new File(appDataDir, fileName);
                 
                 // 复制文件
@@ -527,6 +547,61 @@ public class SettingsFragment extends Fragment {
             Toast.makeText(getActivity(), "设置背景图片失败", Toast.LENGTH_SHORT).show();
         }
     }
+    
+    // 获取文件扩展名
+    private String getFileExtension(Uri uri) {
+        String extension = "jpg";
+        try {
+            // 尝试从MIME类型获取扩展名
+            String mimeType = getActivity().getContentResolver().getType(uri);
+            if (mimeType != null) {
+                if (mimeType.equals("image/png")) {
+                    extension = "png";
+                } else if (mimeType.equals("image/jpeg") || mimeType.equals("image/jpg")) {
+                    extension = "jpg";
+                } else if (mimeType.equals("image/webp")) {
+                    extension = "webp";
+                } else if (mimeType.equals("image/gif")) {
+                    extension = "gif";
+                }
+            }
+            
+            // 如果MIME类型无法确定，尝试从URI路径获取
+            if (extension.equals("jpg")) {
+                String path = uri.getPath();
+                if (path != null) {
+                    int lastDotIndex = path.lastIndexOf('.');
+                    if (lastDotIndex > 0) {
+                        String pathExtension = path.substring(lastDotIndex + 1).toLowerCase();
+                        if (pathExtension.equals("png") || pathExtension.equals("jpg") || 
+                            pathExtension.equals("jpeg") || pathExtension.equals("webp") || 
+                            pathExtension.equals("gif")) {
+                            extension = pathExtension.equals("jpeg") ? "jpg" : pathExtension;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return extension;
+    }
+    
+    // 删除旧的背景文件
+    private void deleteOldBackgroundFiles(File appDataDir) {
+        if (appDataDir.exists() && appDataDir.isDirectory()) {
+            File[] files = appDataDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    // 删除所有背景相关的文件
+                    if (file.getName().startsWith("background_") || 
+                        file.getName().startsWith("app_background")) {
+                        file.delete();
+                    }
+                }
+            }
+        }
+    }
 
     // 加载已保存的配置
     private void loadSavedConfig() {
@@ -537,7 +612,7 @@ public class SettingsFragment extends Fragment {
         etCheckInterval.setText(String.valueOf(sharedPreferences.getInt("check_interval", 60)));
         
         // 加载不透明度设置
-        float backgroundOpacity = sharedPreferences.getFloat("background_opacity", 1.0f);
+        float backgroundOpacity = sharedPreferences.getFloat("background_opacity", 0.5f);
         float cardOpacity = sharedPreferences.getFloat("card_opacity", 0.8f);
         float logsOpacity = sharedPreferences.getFloat("logs_opacity", 0.8f);
         

@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -12,8 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Environment;
 
 import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
-import com.vanilla.screentimeforsleepy.util.AppLogger;
-import com.vanilla.screentimeforsleepy.util.AppUsageSyncInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -155,7 +153,7 @@ public class AppUsageTracker {
 
     // 获取图标目录路径
     private String getIconDirPath() {
-        return context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + ICON_DIR;
+        return context.getExternalFilesDir(null) + File.separator + ICON_DIR;
     }
 
     // 将Drawable转换为Bitmap

@@ -7,17 +7,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".LogsFragment">
+    tools:context=".fragment.LogsFragment">
 
-    <TextView
-        android:id="@+id/tv_title"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="应用日志"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="应用日志"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/iv_delete_logs"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/delete_24px"
+            android:contentDescription="删除日志"
+            android:padding="12dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_filter"
@@ -28,7 +46,6 @@
         android:layout_marginBottom="16dp">
 
         <TextView
-            android:id="@+id/tv_log_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="日志级别:"
@@ -42,7 +59,6 @@
             android:layout_marginRight="16dp" />
 
         <TextView
-            android:id="@+id/tv_auto_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="自动滚动:"

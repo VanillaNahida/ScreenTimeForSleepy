@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
     <!-- 主题色 -->
     <color name="theme_color">#a1de93</color>
     <color name="app_card_background">#CC2C2C2C</color>

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".activity.SettingsActivity">
 
     <RelativeLayout
         android:id="@+id/rl_settings_header"
@@ -27,7 +27,6 @@
             android:src="?attr/homeAsUpIndicator" />
 
         <TextView
-            android:id="@+id/tv_settings_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="设置"
@@ -38,7 +37,6 @@
     </RelativeLayout>
 
     <ScrollView
-        android:id="@+id/sv_settings_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="16dp"
@@ -48,7 +46,6 @@
         app:layout_constraintEnd_toEndOf="parent">
         
         <LinearLayout
-            android:id="@+id/ll_settings_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">

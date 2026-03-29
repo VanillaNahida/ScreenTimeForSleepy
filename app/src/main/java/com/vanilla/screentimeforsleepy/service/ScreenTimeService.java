@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
+
+import com.vanilla.screentimeforsleepy.R;
 
 public class ScreenTimeService extends Service {
 
@@ -54,7 +56,7 @@ public class ScreenTimeService extends Service {
     // 创建通知
     private Notification createNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.mipmap.appicon)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle("屏幕使用时间统计")
                 .setContentText("屏幕使用时间统计正在运行中")
                 .setPriority(NotificationCompat.PRIORITY_LOW)

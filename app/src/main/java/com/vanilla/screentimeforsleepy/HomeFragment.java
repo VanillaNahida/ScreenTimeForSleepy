@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +13,13 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.vanilla.screentimeforsleepy.service.ScreenTimeSyncService;
+import com.vanilla.screentimeforsleepy.util.AppUsageAdapter;
+import com.vanilla.screentimeforsleepy.util.AppUsageInfo;
+import com.vanilla.screentimeforsleepy.util.PermissionUtils;
+import com.vanilla.screentimeforsleepy.util.ThemeManager;
+import com.vanilla.screentimeforsleepy.util.UsageStatsHelper;
 
 public class HomeFragment extends Fragment {
 

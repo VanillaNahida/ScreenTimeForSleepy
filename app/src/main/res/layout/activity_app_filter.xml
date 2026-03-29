@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AppFilterActivity">
+    tools:context=".activity.AppFilterActivity">
 
     <!-- 标题栏 -->
     <LinearLayout

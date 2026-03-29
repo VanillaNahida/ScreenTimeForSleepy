@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
+import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -102,13 +104,19 @@ public class UsageStatsHelper {
     }
     
     /**
-     * 格式化使用时长为可读格式
+     * 格式化使用时长为可读格式，最高单位为时
      */
     public static String formatUsageTime(long milliseconds) {
         long totalSeconds = milliseconds / 1000;
-        long minutes = totalSeconds / 60;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
-        return String.format("%d分%02d秒", minutes, seconds);
+        
+        if (hours > 0) {
+            return String.format("%d时%02d分%02d秒", hours, minutes, seconds);
+        } else {
+            return String.format("%d分%02d秒", minutes, seconds);
+        }
     }
     
     /**

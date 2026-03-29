@@ -1,6 +1,7 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,8 +11,8 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,8 +21,24 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
+import com.vanilla.screentimeforsleepy.util.AppInfo;
+import com.vanilla.screentimeforsleepy.util.AppLogger;
+import com.vanilla.screentimeforsleepy.HomeFragment;
+import com.vanilla.screentimeforsleepy.R;
+import com.vanilla.screentimeforsleepy.service.ScreenTimeSyncService;
+import com.vanilla.screentimeforsleepy.util.ThemeManager;
+import com.vanilla.screentimeforsleepy.fragment.LogsFragment;
+import com.vanilla.screentimeforsleepy.fragment.SettingsFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +56,8 @@ public class AppFilterActivity extends AppCompatActivity {
     private List<AppInfo> allApps;
     private List<AppInfo> filteredApps;
     private AppFilterManager filterManager;
+    private android.os.Handler searchHandler;
+    private Runnable searchRunnable;
     
     // 排序和过滤选项
     private String sortBy = "appName"; // 默认按应用名称排序
@@ -74,6 +93,9 @@ public class AppFilterActivity extends AppCompatActivity {
             tvTitle.setText("应用白名单");
         }
 
+        // 初始化搜索处理器
+        searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+
         // 初始化过滤器管理器
         filterManager = new AppFilterManager(this);
 
@@ -86,20 +108,42 @@ public class AppFilterActivity extends AppCompatActivity {
         // 设置菜单按钮点击事件
         btnMenu.setOnClickListener(v -> showOptionsMenu());
 
-        // 设置搜索功能
+        // 设置搜索功能（带防抖）
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterApps(s.toString());
+                // 取消之前的搜索任务
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                // 创建新的搜索任务，延迟 300ms 执行
+                searchRunnable = () -> filterApps(s.toString());
+                searchHandler.postDelayed(searchRunnable, 300);
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
+        // 设置搜索框回车键监听
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            // 当按下回车键时立即执行搜索
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH ||
+                actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER)) {
+                // 取消之前的搜索任务
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                // 立即执行搜索
+                filterApps(etSearch.getText().toString());
+                return true;
+            }
+            return false;
+        });
 
     }
     
@@ -107,20 +151,27 @@ public class AppFilterActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         isActivityDestroyed = true;
+        // 清理搜索任务
+        if (searchRunnable != null) {
+            searchHandler.removeCallbacks(searchRunnable);
+        }
         // 隐藏加载弹窗
         hideLoadingDialog();
     }
 
 
 
+    // 根据筛选选项过滤后的应用列表（搜索的数据源）
+    private List<AppInfo> optionFilteredApps;
+    
     // 过滤应用
     private void filterApps(String searchText) {
         // 在后台线程中执行过滤操作，避免 UI 线程阻塞
         new Thread(() -> {
             // 创建新列表来存储过滤结果，避免 ConcurrentModificationException
             List<AppInfo> newFilteredApps = new ArrayList<>();
-            // 使用已经根据筛选选项过滤过的filteredApps作为数据源，而不是allApps
-            List<AppInfo> sourceApps = filteredApps != null ? filteredApps : allApps;
+            // 使用根据筛选选项过滤过的 optionFilteredApps 作为数据源，而不是 filteredApps
+            List<AppInfo> sourceApps = optionFilteredApps != null ? optionFilteredApps : allApps;
             if (sourceApps != null) {
                 if (searchText.isEmpty()) {
                     newFilteredApps.addAll(sourceApps);
@@ -419,7 +470,7 @@ public class AppFilterActivity extends AppCompatActivity {
                     if (!isActivityDestroyed) {
                         if (hasAppListPermission) {
                             // 根据筛选选项过滤应用
-                            filteredApps = filterAppsByOptions(allApps);
+                            optionFilteredApps = filterAppsByOptions(allApps);
                             // 应用搜索过滤
                             filterApps(etSearch.getText().toString());
                             // 显示应用列表
@@ -479,7 +530,7 @@ public class AppFilterActivity extends AppCompatActivity {
                     if (!isActivityDestroyed) {
                         if (hasAppListPermission) {
                             // 根据筛选选项过滤应用
-                            filteredApps = filterAppsByOptions(allApps);
+                            optionFilteredApps = filterAppsByOptions(allApps);
                             // 应用搜索过滤
                             filterApps(etSearch.getText().toString());
                             // 显示应用列表
@@ -517,5 +568,102 @@ public class AppFilterActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public static class MainActivity extends AppCompatActivity {
+
+        private BottomNavigationView bottomNavigationView;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            EdgeToEdge.enable(this);
+
+            // 检查是否需要隐藏在最近任务中
+            SharedPreferences prefs = getSharedPreferences("app_config", MODE_PRIVATE);
+            boolean hideInMultitask = prefs.getBoolean("hide_in_multitask", false);
+
+            // 使用ActivityManager API设置是否显示在最近任务中 (API 21+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                android.app.ActivityManager.TaskDescription taskDescription = new android.app.ActivityManager.TaskDescription(null, null, 0);
+                setTaskDescription(taskDescription);
+
+                // 使用ActivityManager API设置任务的排除状态
+                android.app.ActivityManager am = (android.app.ActivityManager) getSystemService(android.content.Context.ACTIVITY_SERVICE);
+                if (am != null) {
+                    List<android.app.ActivityManager.AppTask> tasks = am.getAppTasks();
+                    if (tasks != null && !tasks.isEmpty()) {
+                        tasks.get(0).setExcludeFromRecents(hideInMultitask);
+                    }
+                }
+            }
+
+            setContentView(R.layout.activity_main);
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+
+            // 应用主题设置
+            ThemeManager themeManager = new ThemeManager(this);
+            themeManager.applyTheme();
+
+            // 初始化底部导航栏
+            bottomNavigationView = findViewById(R.id.bottom_navigation);
+            bottomNavigationView.setOnNavigationItemSelectedListener(this::onNavigationItemSelected);
+
+            // 启动屏幕使用时间同步服务
+            AppLogger.i("MainActivity", "启动屏幕使用时间同步服务");
+            ScreenTimeSyncService.startService(this);
+            AppLogger.i("MainActivity", "应用启动成功");
+
+            // 默认显示首页 Fragment
+            if (savedInstanceState == null) {
+                loadFragment(new HomeFragment());
+            }
+        }
+
+        @Override
+        protected void onResume() {
+            super.onResume();
+            // 每次恢复时重新应用主题（设置页面修改后会立即生效）
+            ThemeManager themeManager = new ThemeManager(this);
+            themeManager.applyTheme();
+        }
+
+        // 底部导航栏选择监听器
+        private boolean onNavigationItemSelected(MenuItem item) {
+            Fragment fragment = null;
+
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                fragment = new HomeFragment();
+            } else if (itemId == R.id.nav_logs) {
+                fragment = new LogsFragment();
+            } else if (itemId == R.id.nav_settings) {
+                fragment = new SettingsFragment();
+            }
+
+            return loadFragment(fragment);
+        }
+
+        // 加载 Fragment
+        private boolean loadFragment(Fragment fragment) {
+            if (fragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .commitNow();
+                // 应用主题设置，确保切换Fragment后主题保持一致
+                // 使用postDelayed确保Fragment的视图已经创建完成
+                findViewById(R.id.fragment_container).post(() -> {
+                    ThemeManager themeManager = new ThemeManager(this);
+                    themeManager.applyTheme();
+                });
+                return true;
+            }
+            return false;
+        }
     }
 }

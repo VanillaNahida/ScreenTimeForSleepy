@@ -1,17 +1,12 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-import android.widget.Switch;
+
+import com.vanilla.screentimeforsleepy.R;
 
 import java.io.File;
 
@@ -42,7 +37,7 @@ public class ThemeManager {
             
         float opacity = memoryStorage.getBackgroundOpacity() != null 
             ? memoryStorage.getBackgroundOpacity() 
-            : prefs.getFloat(KEY_BACKGROUND_OPACITY, 1.0f);
+            : prefs.getFloat(KEY_BACKGROUND_OPACITY, 0.5f);
             
         float cardOpacity = memoryStorage.getCardOpacity() != null 
             ? memoryStorage.getCardOpacity() 
@@ -89,7 +84,7 @@ public class ThemeManager {
         float bottomNavOpacity = Math.min(1.0f, 
             (memoryStorage.getBackgroundOpacity() != null 
                 ? memoryStorage.getBackgroundOpacity() 
-                : prefs.getFloat(KEY_BACKGROUND_OPACITY, 1.0f)) + 0.1f);
+                : prefs.getFloat(KEY_BACKGROUND_OPACITY, 0.5f)) + 0.1f);
         
         // 应用到指定视图及其子视图
         applyThemeToComponents(view, cardOpacity, logsOpacity, bottomNavOpacity);

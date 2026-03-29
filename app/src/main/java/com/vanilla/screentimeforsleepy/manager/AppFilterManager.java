@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;

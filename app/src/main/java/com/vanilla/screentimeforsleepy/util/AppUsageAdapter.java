@@ -1,4 +1,4 @@
-package com.vanilla.screentimeforsleepy;
+package com.vanilla.screentimeforsleepy.util;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
+import com.vanilla.screentimeforsleepy.R;
 import com.vanilla.screentimeforsleepy.activity.AppFilterActivity;
-import com.vanilla.screentimeforsleepy.util.UsageStatsHelper;
 
 import java.util.List;
 
