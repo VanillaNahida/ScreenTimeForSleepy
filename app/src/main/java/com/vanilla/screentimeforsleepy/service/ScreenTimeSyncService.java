@@ -203,6 +203,7 @@ public class ScreenTimeSyncService extends Service {
         // 添加应用使用时间数据
         for (Map.Entry<String, AppUsageSyncInfo> entry : appUsageMap.entrySet()) {
             JSONObject appInfo = new JSONObject();
+            appInfo.put("name", entry.getValue().getName());
             appInfo.put("icon", entry.getValue().getIcon());
             appInfo.put("total_time", entry.getValue().getTotalTime());
             appUsage.put(entry.getKey(), appInfo);

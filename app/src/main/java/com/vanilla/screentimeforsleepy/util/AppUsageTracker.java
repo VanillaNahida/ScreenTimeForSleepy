@@ -98,10 +98,11 @@ public class AppUsageTracker {
                     
                     // 添加到映射中
                     AppUsageSyncInfo appUsageInfo = new AppUsageSyncInfo();
+                    appUsageInfo.setName(displayName);
                     appUsageInfo.setIcon(iconFileName);
                     appUsageInfo.setTotalTime((int) totalTimeSeconds);
                     
-                    appUsageMap.put(displayName, appUsageInfo);
+                    appUsageMap.put(packageName, appUsageInfo);
                     
                 } catch (PackageManager.NameNotFoundException e) {
                     AppLogger.e(TAG, "Package not found: " + usageStats.getPackageName(), e);
