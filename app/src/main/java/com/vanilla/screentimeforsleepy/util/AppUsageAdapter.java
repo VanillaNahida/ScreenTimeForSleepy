@@ -108,10 +108,10 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
         androidx.appcompat.widget.PopupMenu popupMenu = new androidx.appcompat.widget.PopupMenu(view.getContext(), view);
         
         // 添加菜单项
-        popupMenu.getMenu().add(0, 1, 0, "添加到黑名单");
-        popupMenu.getMenu().add(0, 2, 0, "添加到白名单");
-        popupMenu.getMenu().add(0, 3, 0, "设置别名");
-        popupMenu.getMenu().add(0, 4, 0, "查看详情");
+        popupMenu.getMenu().add(0, 1, 0, "查看详情");
+        popupMenu.getMenu().add(0, 2, 0, "设置别名");
+        popupMenu.getMenu().add(0, 3, 0, "添加到黑名单");
+        popupMenu.getMenu().add(0, 4, 0, "添加到白名单");
         
         // 设置菜单项点击事件
         popupMenu.setOnMenuItemClickListener(item -> {
@@ -120,6 +120,14 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
             
             switch (itemId) {
                 case 1:
+                    // 查看详情
+                    openAppDetails(view, appUsageInfo.getPackageName());
+                    return true;
+                case 2:
+                    // 设置别名
+                    showSetAliasDialog(view, appUsageInfo);
+                    return true;
+                case 3:
                     // 添加到黑名单
                     filterManager.addToFilterList(AppFilterActivity.FILTER_TYPE_BLACKLIST, appUsageInfo.getPackageName());
                     androidx.appcompat.app.AlertDialog.Builder builder1 = new androidx.appcompat.app.AlertDialog.Builder(view.getContext());
@@ -133,7 +141,7 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
                     });
                     builder1.show();
                     return true;
-                case 2:
+                case 4:
                     // 添加到白名单
                     filterManager.addToFilterList(AppFilterActivity.FILTER_TYPE_WHITELIST, appUsageInfo.getPackageName());
                     androidx.appcompat.app.AlertDialog.Builder builder2 = new androidx.appcompat.app.AlertDialog.Builder(view.getContext());
@@ -146,14 +154,6 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.AppUsa
                         }
                     });
                     builder2.show();
-                    return true;
-                case 3:
-                    // 设置别名
-                    showSetAliasDialog(view, appUsageInfo);
-                    return true;
-                case 4:
-                    // 查看详情
-                    openAppDetails(view, appUsageInfo.getPackageName());
                     return true;
                 default:
                     return false;
