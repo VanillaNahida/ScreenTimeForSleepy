@@ -41,6 +41,16 @@
             android:ellipsize="end"
             android:singleLine="true" />
 
+        <TextView
+            android:id="@+id/tv_package_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="@color/app_card_text_secondary"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_marginTop="4dp" />
+
         <ProgressBar
             android:id="@+id/pb_usage_time"
             style="?android:attr/progressBarStyleHorizontal"

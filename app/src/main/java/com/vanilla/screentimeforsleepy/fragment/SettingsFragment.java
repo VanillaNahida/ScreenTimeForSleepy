@@ -50,7 +50,7 @@ public class SettingsFragment extends Fragment {
     private Button btnSave, btnAutoStart, btnBatteryOptimization, btnManageBlacklist, btnManageWhitelist, btnClearIconCache, btnPickBackground;
     private TextView tvNotification, tvAccessibility, tvBackgroundStatus, tvBackgroundOpacityValue, tvCardOpacityValue, tvLogsOpacityValue;
     private android.widget.SeekBar sbBackgroundOpacity, sbCardOpacity, sbLogsOpacity;
-    private Switch swNotification, swAccessibility, swHideSystemApps, swBlacklist, swWhitelist, swHideInMultitask;
+    private Switch swNotification, swAccessibility, swHideSystemApps, swBlacklist, swWhitelist, swHideInMultitask, swShowPackageName;
     private ImageButton btnToggleApiKey;
     private SharedPreferences sharedPreferences;
     private boolean isApiKeyVisible = false;
@@ -105,6 +105,7 @@ public class SettingsFragment extends Fragment {
             swAccessibility.setTrackTintList(trackColorStateList);
             swHideSystemApps.setTrackTintList(trackColorStateList);
             swHideInMultitask.setTrackTintList(trackColorStateList);
+            swShowPackageName.setTrackTintList(trackColorStateList);
             swBlacklist.setTrackTintList(trackColorStateList);
             swWhitelist.setTrackTintList(trackColorStateList);
         } catch (Exception e) {
@@ -183,6 +184,7 @@ public class SettingsFragment extends Fragment {
         swAccessibility = view.findViewById(R.id.sw_accessibility);
         swHideSystemApps = view.findViewById(R.id.sw_hide_system_apps);
         swHideInMultitask = view.findViewById(R.id.sw_hide_in_multitask);
+        swShowPackageName = view.findViewById(R.id.sw_show_package_name);
         swBlacklist = view.findViewById(R.id.sw_blacklist);
         swWhitelist = view.findViewById(R.id.sw_whitelist);
     }
@@ -626,6 +628,7 @@ public class SettingsFragment extends Fragment {
         
         swHideSystemApps.setChecked(sharedPreferences.getBoolean("hide_system_apps", true));
         swHideInMultitask.setChecked(sharedPreferences.getBoolean("hide_in_multitask", false));
+        swShowPackageName.setChecked(sharedPreferences.getBoolean("show_package_name", false));
         
         // 加载背景图片状态
         String backgroundImage = sharedPreferences.getString("background_image", "");
@@ -666,6 +669,7 @@ public class SettingsFragment extends Fragment {
         editor.putInt("check_interval", interval);
         editor.putBoolean("hide_system_apps", swHideSystemApps.isChecked());
         editor.putBoolean("hide_in_multitask", newHideInMultitask);
+        editor.putBoolean("show_package_name", swShowPackageName.isChecked());
         editor.putBoolean("enable_blacklist", swBlacklist.isChecked());
         editor.putBoolean("enable_whitelist", swWhitelist.isChecked());
         

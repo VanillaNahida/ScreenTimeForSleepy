@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.vanilla.screentimeforsleepy.manager.AppAliasManager;
 import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
 
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ public class UsageStatsHelper {
     public List<AppUsageInfo> getTodayUsageStats(boolean hideSystemApps) {
         // 获取AppFilterManager实例
         AppFilterManager filterManager = new AppFilterManager(context);
+        // 获取AppAliasManager实例
+        AppAliasManager aliasManager = new AppAliasManager(context);
         
         // 获取今天凌晨的时间戳
         Calendar calendar = Calendar.getInstance();
@@ -69,11 +72,15 @@ public class UsageStatsHelper {
                         continue;
                     }
                     
+                    // 获取应用别名
+                    String alias = aliasManager.getAppAlias(packageName);
+                    
                     AppUsageInfo appUsageInfo = new AppUsageInfo(
                             appName,
                             usageStats.getPackageName(),
                             usageStats.getTotalTimeInForeground(),
-                            appInfo.loadIcon(packageManager)
+                            appInfo.loadIcon(packageManager),
+                            alias
                     );
                     
                     appUsageInfoList.add(appUsageInfo);

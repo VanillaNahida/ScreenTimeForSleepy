@@ -121,11 +121,20 @@ public class HomeFragment extends Fragment {
         // 计算最大使用时长
         long maxUsageTime = UsageStatsHelper.getMaxUsageTime(appUsageInfoList);
 
+        // 读取显示包名的设置
+        SharedPreferences prefs = getActivity().getSharedPreferences("app_config", getActivity().MODE_PRIVATE);
+        boolean showPackageName = prefs.getBoolean("show_package_name", false);
+
         // 初始化RecyclerView
-        AppUsageAdapter adapter = new AppUsageAdapter(appUsageInfoList, maxUsageTime);
+        AppUsageAdapter adapter = new AppUsageAdapter(appUsageInfoList, maxUsageTime, showPackageName);
         // 设置应用过滤变化监听器
         adapter.setOnAppFilterChangeListener(() -> {
             // 当应用被添加到黑白名单后，刷新应用列表
+            checkPermissionAndLoadData();
+        });
+        // 设置应用别名变化监听器
+        adapter.setOnAliasChangeListener(() -> {
+            // 当应用别名修改后，刷新应用列表
             checkPermissionAndLoadData();
         });
         rvAppUsage.setLayoutManager(new LinearLayoutManager(getActivity()));

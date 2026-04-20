@@ -7,12 +7,22 @@ public class AppUsageInfo {
     private final String packageName;
     private final long usageTime;
     private final Drawable appIcon;
+    private final String alias;
     
     public AppUsageInfo(String appName, String packageName, long usageTime, Drawable appIcon) {
         this.appName = appName;
         this.packageName = packageName;
         this.usageTime = usageTime;
         this.appIcon = appIcon;
+        this.alias = null;
+    }
+    
+    public AppUsageInfo(String appName, String packageName, long usageTime, Drawable appIcon, String alias) {
+        this.appName = appName;
+        this.packageName = packageName;
+        this.usageTime = usageTime;
+        this.appIcon = appIcon;
+        this.alias = alias;
     }
     
     public String getAppName() {
@@ -29,5 +39,13 @@ public class AppUsageInfo {
     
     public Drawable getAppIcon() {
         return appIcon;
+    }
+    
+    public String getAlias() {
+        return alias;
+    }
+    
+    public String getDisplayName() {
+        return alias != null ? alias : appName;
     }
 }

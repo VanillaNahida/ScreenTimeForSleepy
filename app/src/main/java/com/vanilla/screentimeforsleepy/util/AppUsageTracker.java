@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 
+import com.vanilla.screentimeforsleepy.manager.AppAliasManager;
 import com.vanilla.screentimeforsleepy.manager.AppFilterManager;
 
 import java.io.File;
@@ -43,6 +44,8 @@ public class AppUsageTracker {
         
         // 获取AppFilterManager实例
         AppFilterManager filterManager = new AppFilterManager(context);
+        // 获取AppAliasManager实例
+        AppAliasManager aliasManager = new AppAliasManager(context);
         
         // 获取今天的开始时间
         long startTime = getTodayStartTime();
@@ -78,6 +81,10 @@ public class AppUsageTracker {
                     String appName = appInfo.loadLabel(packageManager).toString();
                     String packageName = appInfo.packageName;
                     
+                    // 获取应用别名
+                    String alias = aliasManager.getAppAlias(packageName);
+                    String displayName = alias != null ? alias : appName;
+                    
                     // 根据黑白名单过滤应用
                     if (!filterManager.shouldIncludeApp(packageName)) {
                         continue;
@@ -94,7 +101,7 @@ public class AppUsageTracker {
                     appUsageInfo.setIcon(iconFileName);
                     appUsageInfo.setTotalTime((int) totalTimeSeconds);
                     
-                    appUsageMap.put(appName, appUsageInfo);
+                    appUsageMap.put(displayName, appUsageInfo);
                     
                 } catch (PackageManager.NameNotFoundException e) {
                     AppLogger.e(TAG, "Package not found: " + usageStats.getPackageName(), e);

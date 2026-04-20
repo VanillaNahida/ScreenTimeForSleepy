@@ -5,6 +5,7 @@
     <color name="theme_color">#a1de93</color>
     <color name="app_card_background">#CCFFFFFF</color>
     <color name="app_card_text">#FF000000</color>
+    <color name="app_card_text_secondary">#80000000</color>
     <color name="progress_bar_background">#E0E0E0</color>
     <color name="progress_bar_progress">@color/theme_color</color>
     <!-- 日志背景色 - 黑色半透明 -->
